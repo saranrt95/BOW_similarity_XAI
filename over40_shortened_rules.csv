@@ -1,0 +1,7 @@
+"RULE 1: IF Hip.ACC.Mean > 4.132912 AND Hip.yposture.Mean <= 64.906740 AND Wrist.jerk.coefficient.of.variation <= 116.520000 THEN fatiguestate1 = ""0"""
+"RULE 2: IF Hip.ACC.Mean > 4.580647 AND Hip.yposture.Mean <= 64.906740 THEN fatiguestate1 = ""0"""
+"RULE 3: IF Hip.yposture.Mean <= 64.290487 AND Ankle.xposture.Mean > -1.778758 AND 'back rotation position in sag plane' <= 7.780000 THEN fatiguestate1 = ""0"""
+"RULE 4: IF Ankle.xposture.Mean <= -4.430574 THEN fatiguestate1 = ""0"""
+"RULE 5: IF Hip.ACC.Mean <= 3.961156 THEN fatiguestate1 = ""1"""
+"RULE 6: IF Hip.ACC.Mean <= 5.103555 AND Hip.yposture.Mean > 64.290487 AND Ankle.xposture.Mean > -5.555916 THEN fatiguestate1 = ""1"""
+"RULE 7: IF Hip.ACC.Mean <= 4.609755 AND Wrist.jerk.coefficient.of.variation > 107.135000 THEN fatiguestate1 = ""1"""
