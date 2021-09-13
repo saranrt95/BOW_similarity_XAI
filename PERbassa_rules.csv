@@ -1,0 +1,12 @@
+"RULE 1: IF N > 8 AND v0 > 42 THEN collision = ""1 collision""",COVERING: 0.570453,ERROR: 0.045398
+"RULE 2: IF N > 9 THEN collision = ""1 collision""",COVERING: 0.540658,ERROR: 0.015339
+"RULE 3: IF N > 8 AND PER <= 0.365000 AND v0 > 36 THEN collision = ""1 collision""",COVERING: 0.428305,ERROR: 0.044469
+"RULE 4: IF N > 8 AND v0 <= 36 THEN collision = ""1 collision""",COVERING: 0.210428,ERROR: 0.048187
+"RULE 5: IF N <= 8 AND PER <= 0.385000 THEN collision = ""0 safe""",COVERING: 0.702510,ERROR: 0.040968
+"RULE 6: IF N <= 7 AND PER <= 0.425000 THEN collision = ""0 safe""",COVERING: 0.646576,ERROR: 0.043451
+"RULE 7: IF N <= 8 AND v0 <= 57 THEN collision = ""0 safe""",COVERING: 0.556399,ERROR: 0.028554
+"RULE 8: IF N <= 5 THEN collision = ""0 safe""",COVERING: 0.456771,ERROR: 0.040968
+"RULE 9: IF N <= 8 AND F0 > -5 THEN collision = ""0 safe""",COVERING: 0.413387,ERROR: 0.027312
+"RULE 10: IF N <= 9 AND v0 <= 32 THEN collision = ""0 safe""",COVERING: 0.300589,ERROR: 0.048417
+"RULE 11: IF N <= 9 AND F0 > -8 AND d0 > 7.485000 AND PER <= 0.475000 AND v0 <= 78 THEN collision = ""0 safe""",COVERING: 0.218159,ERROR: 0.047796
+"RULE 12: IF N <= 9 AND PER <= 0.145000 AND v0 > 32 THEN collision = ""0 safe""",COVERING: 0.201890,ERROR: 0.046555
