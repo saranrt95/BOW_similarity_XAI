@@ -4,3 +4,5 @@ Sara Narteni, Melissa Ferretti, Vittorio Rampa, and Maurizio Mongelli. "Bag-of-W
 
 Both Python notebooks just need 2 rulesets as input files: "under40_shortened_rules.csv" and "over40_shortened_rules.csv" for "BOW_distance_fatigue.ipynb"; 
 "PERalta_rules.csv" and "PERbassa_rules.csv" for "BOW_distance_platooning.ipynb"
+
+We also share the original data that were used to generate the rulesets. In our case, we adopted Logic Learning Machine, but the BOW similarity approach can be applied to any rule-based algorithm, provided being able to express the rules in IF-THEN format. 
