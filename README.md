@@ -1,9 +1,8 @@
 # BOW_similarity_XAI
 ## Description
-This repository contains the code associated to our paper "Bag-of-Words Similarity in eXplainable AI"
-Sara Narteni, Melissa Ferretti, Vittorio Rampa, and Maurizio Mongelli. , accepted for publication in the proceedings of the Intelligent Systems Conference (IntelliSys) 2022.
+This repository contains the code associated to our paper: S. Narteni, M. Ferretti, V. Rampa, M. Mongelli, "Bag-of-Words Similarity in eXplainable AI" Intelligent Systems Conference (IntelliSys), Amsterdam, The Netherlands, 1-2 Sept. 2022
 
-The aim is to compute the rule similarity between two rulesets, via adoption of a Bag-of-Words approach.
+The aim is to compute the rule similarity between two rulesets, via adoption of an innovative approach based on the Bag-of-Words concept.
 
 ## Usage
 
