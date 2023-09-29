@@ -2,6 +2,8 @@ import pandas as pd
 from collections import Counter
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+from config import*
+import re
 
 def ProcessRulesets(Ruleset1, Ruleset2, class_labels_dict):
     """ Given the rulesets, finds each rule premise ("Rule") and 
@@ -11,6 +13,7 @@ def ProcessRulesets(Ruleset1, Ruleset2, class_labels_dict):
         
     Ruleset1['Rule'] = Ruleset1.apply(lambda x: x[0][x[0].find('IF')+3:x[0].find('THEN')-1], axis=1)
     #Ruleset1['Class'] = Ruleset1.apply(lambda x: x[0][x[0].find('"')+1:x[0].find('"')+2], axis=1)
+    #print(Ruleset1[0])
     Ruleset1['Class'] = Ruleset1.apply(lambda x: x[0].split('"')[1], axis=1)
 
     Ruleset1.drop(Ruleset1.columns[0] , axis=1, inplace=True)
@@ -25,7 +28,7 @@ def ProcessRulesets(Ruleset1, Ruleset2, class_labels_dict):
     Ruleset_Tot['Class'] = Ruleset_Tot['Class'].apply(convert_litteral, args=(class_labels_dict,))
     return Ruleset_Tot
 
-def ImportAndProcessRulesets(base_dir, rulefile1, rulefile2, rulesetIDlist, class_labels_dict):
+def ImportAndProcessRulesets(rulefile1, rulefile2, rulesetIDlist, class_labels_dict):
     """ Import IF-THEN rulesets, in csv format;
     inputs:
     base_dir: workfolder with rulesets
@@ -37,10 +40,23 @@ def ImportAndProcessRulesets(base_dir, rulefile1, rulefile2, rulesetIDlist, clas
     in logical AND) and Class (output) ; 
     """ 
     # read csv rulesets
-    Ruleset1 = pd.read_csv(base_dir+'/'+rulefile1, header=None) 
+    Ruleset1 = pd.read_csv(rulefile1, header=None)
+    #print(Ruleset1)
+    '''
+    Ruleset1.drop(Ruleset1.columns[1] , axis=1, inplace=True)
+    Ruleset1.drop(Ruleset1.columns[1] , axis=1, inplace=True)
+    print(Ruleset1)
+    '''
     Ruleset1['Set'] = rulesetIDlist[0]
-    Ruleset2 = pd.read_csv(base_dir+'/'+rulefile2, header=None) 
+    
+    Ruleset2 = pd.read_csv(rulefile2, header=None)
+    '''
+    Ruleset2.drop(Ruleset2.columns[1] , axis=1, inplace=True)
+    Ruleset2.drop(Ruleset2.columns[1] , axis=1, inplace=True)
+    print(Ruleset2)
+    '''  
     Ruleset2['Set'] = rulesetIDlist[1]
+
     # separate premise and consequence
     Ruleset = ProcessRulesets(Ruleset1, Ruleset2, class_labels_dict)
     return Ruleset
@@ -50,10 +66,24 @@ def UniqueConditionOccurrences(Ruleset):
     terms = []
     for index, value in Ruleset.loc[:,'Rule'].items():
         for r in value.split(' AND '):
+            #print(r)
+
             if r.find('>')>0:
+
                 terms.append(r[:r.find('>')+2].replace(" ", ""))
             else:
-                terms.append(r[:r.find('<')+2].replace(" ", ""))
+                idxlist = [m.start() for m in re.finditer('<', r)]
+                if len(idxlist) == 1:
+                    terms.append(r[:r.find('<')+2].replace(" ", ""))
+                else:
+                	#len = 2 --> a < feature < b
+                	feat_thresh = r[:idxlist[1]].replace(" ","").split("<")
+                	conditionpart1 = feat_thresh[1]+">"#+feat_thresh[0]
+                	conditionpart2 = feat_thresh[1]+"<="
+                	#print(conditionpart1)
+                	#print(conditionpart2)
+                	terms.append(conditionpart1)
+                	terms.append(conditionpart2)
     # counts unique occurrences
     counter = Counter(terms)
     return counter
@@ -61,19 +91,23 @@ def UniqueConditionOccurrences(Ruleset):
 def CreateFSandTcolumns(Ruleset, counter):
     # iterate on unique feature plus operator
     for c in counter:
+      #print("c: ",c)
       # index is the row of "Regola" column, value is the rule in the column
       for index, value in Ruleset.loc[:,'Rule'].items():
         # get single conditions of the rule and check the presence of condition c in them
         for r in value.split(' AND '):
+          #print("r: ",r)
           # r condition matches condition c (with operators > or >=)
           if r[:r.find('>')+2].replace(" ", "") == c:
             # set fs column to 1
             Ruleset.loc[index, c] = 1
-            # set threshold column value to the threshold contained in r 
+            # set threshold column value to the threshold contained in r
+            #print(r.split('>')[1].strip()) 
             Ruleset.loc[index, c+'Value'] = float(r.split('>')[1].strip())
           # same as above, for < or <= operators
           if r[:r.find('<')+2].replace(" ", "") == c:
             Ruleset.loc[index, c] = 1
+            #print(r.split('<=')[1].strip())
             Ruleset.loc[index, c+'Value'] = float(r.split('<=')[1].strip())
     return Ruleset
 
@@ -102,7 +136,8 @@ def NormalizeThresholds(Ruleset, counter):
         del Ruleset[c+'Value']
     return Ruleset
 
-def buildBOW(Ruleset, outfilename, save_res = True):
+def buildBOW(Ruleset, save_res = True):
+
     # get unique set of rules conditions (no repetititions)
     counter = UniqueConditionOccurrences(Ruleset)
     # 1. INITIALIZE BOW MATRIX
@@ -124,7 +159,7 @@ def buildBOW(Ruleset, outfilename, save_res = True):
     
     # 4. Save to excel in current path
     if save_res:
-        Ruleset.to_excel(outfilename, index=True)
+        Ruleset.to_excel(outputBoW, index=True)
     # 5. Convert FS and T columns in Ruleset from DataFrame to numpy array
     # this is the proper BoW matrix ("Set","Rule" and "Class" are no more considered)
     bow_matrix = Ruleset.iloc[:,3:Ruleset.shape[1]].to_numpy()
@@ -132,13 +167,14 @@ def buildBOW(Ruleset, outfilename, save_res = True):
     return bow_matrix
 
 
-def BoW_Similarity(bow_matrix, Ruleset, outfilename, save_res=True):  
+def BoW_Similarity(bow_matrix, Ruleset, save_res=True):  
     BowSim = cosine_similarity(bow_matrix, bow_matrix)
     RuleSimilarities = pd.DataFrame(BowSim,
-                       index = Ruleset['Set'] + ' - ' + Ruleset['Class'] + ' - ' + Ruleset['Rule'],
-                       columns = Ruleset['Set'] + ' - ' + Ruleset['Class'] + ' - ' + Ruleset['Rule'])
+                       index = Ruleset['Set'] + ' ~ ' + Ruleset['Class'] + ' ~ ' + Ruleset['Rule'],
+                       columns = Ruleset['Set'] + ' ~ ' + Ruleset['Class'] + ' ~ ' + Ruleset['Rule'])
     if save_res:
-        RuleSimilarities.to_excel(outfilename, index=True)
+        RuleSimilarities.to_excel(outputRuleSim, index=True)
     return RuleSimilarities
+
 
 
